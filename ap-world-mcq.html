@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AP World History MCQ Practice</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .app {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0 20px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        /* Period Filter */
+        .period-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .period-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 0.82rem;
+            transition: all 0.2s;
+        }
+
+        .period-btn:hover { border-color: #60a5fa; color: #e2e8f0; }
+        .period-btn.active { background: #1e40af; border-color: #3b82f6; color: #fff; }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #334155;
+        }
+
+        .stat { text-align: center; }
+        .stat-value { font-size: 1.4rem; font-weight: 700; color: #60a5fa; }
+        .stat-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Question Card */
+        .question-card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid #334155;
+            margin-bottom: 20px;
+        }
+
+        .question-meta {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-period { background: #1e3a5f; color: #60a5fa; }
+        .badge-topic { background: #3b1f5e; color: #a78bfa; }
+        .badge-num { background: #1a3328; color: #4ade80; }
+
+        .stimulus {
+            background: #0f172a;
+            border-left: 3px solid #60a5fa;
+            padding: 16px;
+            margin-bottom: 18px;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .stimulus-source {
+            font-style: normal;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 8px;
+        }
+
+        .question-text {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #f1f5f9;
+        }
+
+        .options { display: flex; flex-direction: column; gap: 10px; }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            cursor: pointer;
+            transition: all 0.2s;
+            line-height: 1.5;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #60a5fa;
+            background: #172554;
+        }
+
+        .option-letter {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        .option.correct { border-color: #22c55e; background: #052e16; }
+        .option.correct .option-letter { background: #22c55e; color: #052e16; }
+        .option.incorrect { border-color: #ef4444; background: #2a0a0a; }
+        .option.incorrect .option-letter { background: #ef4444; color: #fff; }
+        .option.show-correct { border-color: #22c55e44; background: #052e1644; }
+        .option.disabled { cursor: default; }
+
+        /* Explanation */
+        .explanation {
+            margin-top: 18px;
+            padding: 18px;
+            background: #0f172a;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            display: none;
+        }
+
+        .explanation.show { display: block; }
+
+        .explanation h4 {
+            color: #60a5fa;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .explanation p {
+            color: #94a3b8;
+            line-height: 1.6;
+            font-size: 0.92rem;
+        }
+
+        /* Next button */
+        .next-btn {
+            display: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .next-btn:hover { opacity: 0.9; }
+        .next-btn.show { display: block; }
+
+        /* Home screen */
+        .home-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .home-screen h2 {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            color: #f1f5f9;
+        }
+
+        .home-screen p {
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+
+        .start-btn {
+            padding: 14px 40px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: #fff;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s, opacity 0.2s;
+        }
+
+        .start-btn:hover { opacity: 0.9; transform: scale(1.02); }
+
+        /* Results screen */
+        .results-screen {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+
+        .results-screen h2 { font-size: 1.6rem; margin-bottom: 8px; }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 4px solid #3b82f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 24px auto;
+        }
+
+        .score-circle .pct { font-size: 2.2rem; font-weight: 800; color: #60a5fa; }
+        .score-circle .label { font-size: 0.8rem; color: #64748b; }
+
+        .results-detail {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0 30px;
+        }
+
+        .results-detail .stat-value { font-size: 1.2rem; }
+
+        .restart-btn {
+            padding: 14px 40px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .restart-btn:hover { opacity: 0.9; }
+
+        /* Progress bar */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #334155;
+            border-radius: 2px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 600px) {
+            .app { padding: 12px; }
+            header h1 { font-size: 1.4rem; }
+            .question-card { padding: 18px; }
+            .stats-bar { flex-wrap: wrap; gap: 10px; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header>
+            <h1>AP World History MCQ Practice</h1>
+            <p>8000 BCE &mdash; Present | All 9 Units</p>
+        </header>
+
+        <!-- Home Screen -->
+        <div id="home" class="home-screen">
+            <h2>Select Time Periods</h2>
+            <p>Choose which periods to study, then start the quiz.</p>
+            <div class="period-filter" id="periodFilter"></div>
+            <br>
+            <button class="start-btn" onclick="startQuiz()">Start Practice</button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz" style="display:none;">
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value" id="scoreVal">0</div>
+                    <div class="stat-label">Correct</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="totalVal">0/0</div>
+                    <div class="stat-label">Progress</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="streakVal">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="pctVal">0%</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="question-card" id="questionCard"></div>
+            <div class="explanation" id="explanation"></div>
+            <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question</button>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results" class="results-screen"></div>
+    </div>
+
+<script>
+// ── Question Bank ──
+const questions = [
+    // ═══ UNIT 1: The Global Tapestry (c. 1200–1450) ═══
+    {
+        period: "Unit 1",
+        periodName: "The Global Tapestry (1200–1450)",
+        topic: "Song Dynasty China",
+        stimulus: `"The people of the Song dynasty produced more iron in a single year than the whole of Europe would produce for centuries. Great furnaces dotted the landscape of northern China, and the smoke of industry hung thick over the cities."`,
+        stimulusSource: "— Economic historian, modern analysis",
+        question: "Which of the following best explains the significance of Song dynasty industrial production described in the passage?",
+        options: [
+            "It demonstrated that China had surpassed all other civilizations permanently",
+            "It reflected an era of technological innovation and proto-industrialization in East Asia",
+            "It proved that European economies were entirely stagnant during this period",
+            "It was primarily driven by demand for weapons during the Mongol invasions"
+        ],
+        correct: 1,
+        explanation: "The Song dynasty (960–1279) experienced remarkable economic and technological growth, including advances in iron production, printing, gunpowder, and the compass. This proto-industrialization reflected broader patterns of innovation in East Asia, though it does not mean other civilizations were stagnant."
+    },
+    {
+        period: "Unit 1",
+        periodName: "The Global Tapestry (1200–1450)",
+        topic: "Dar al-Islam",
+        stimulus: `"From Cordoba to Baghdad, from Cairo to Samarkand, scholars translated Greek texts, advanced algebra, and perfected techniques of irrigation that transformed arid lands into gardens."`,
+        stimulusSource: "— Historical survey of Islamic civilization",
+        question: "The developments described in the passage best illustrate which historical process?",
+        options: [
+            "The spread of Islam through forced conversion of conquered peoples",
+            "The role of Islamic scholars in preserving and expanding classical knowledge",
+            "The decline of the Byzantine Empire due to Islamic military conquests",
+            "The isolation of Islamic civilization from other Eurasian cultures"
+        ],
+        correct: 1,
+        explanation: "Islamic scholars played a crucial role in translating, preserving, and building upon Greek, Persian, and Indian knowledge during the Islamic Golden Age. This intellectual tradition connected diverse regions of Dar al-Islam and would later influence the European Renaissance."
+    },
+    {
+        period: "Unit 1",
+        periodName: "The Global Tapestry (1200–1450)",
+        topic: "Mongol Empire",
+        question: "The Pax Mongolica (c. 1250–1350) most directly facilitated which of the following?",
+        options: [
+            "The collapse of long-distance trade across Eurasia",
+            "Increased exchange of goods, ideas, and diseases along trans-Eurasian routes",
+            "The permanent unification of China and the Middle East under one government",
+            "The isolation of Europe from Asian trade networks"
+        ],
+        correct: 1,
+        explanation: "The Pax Mongolica, or 'Mongol Peace,' created relatively stable conditions across the vast Mongol Empire, enabling increased trade, cultural exchange, and unfortunately, the spread of diseases like the Black Death along the Silk Roads."
+    },
+    {
+        period: "Unit 1",
+        periodName: "The Global Tapestry (1200–1450)",
+        topic: "South and Southeast Asia",
+        stimulus: `"The temples of Angkor stretched across an area larger than modern-day Paris, supported by a vast system of reservoirs and canals that fed the rice paddies sustaining a population of nearly one million."`,
+        stimulusSource: "— Archaeological study of the Khmer Empire",
+        question: "The infrastructure described in the passage best demonstrates which characteristic of the Khmer Empire?",
+        options: [
+            "Its reliance on maritime trade as the sole source of wealth",
+            "Its use of sophisticated hydraulic engineering to support a large agrarian state",
+            "Its adoption of Islamic architectural principles from Arab traders",
+            "Its political system modeled directly on Chinese Confucian bureaucracy"
+        ],
+        correct: 1,
+        explanation: "The Khmer Empire centered at Angkor developed an extraordinary hydraulic system (barays and canals) that enabled intensive rice agriculture, supporting a massive population. This engineering feat was central to Khmer state power and reflected Hindu-Buddhist cultural influences, not Islamic or Chinese models."
+    },
+    {
+        period: "Unit 1",
+        periodName: "The Global Tapestry (1200–1450)",
+        topic: "Africa",
+        stimulus: `"Mansa Musa's pilgrimage to Mecca in 1324 was so lavish that his distribution of gold in Cairo caused the price of gold to plummet for a decade."`,
+        stimulusSource: "— Al-Umari, contemporary Arab historian",
+        question: "Mansa Musa's pilgrimage best illustrates which of the following about the Mali Empire?",
+        options: [
+            "Mali was primarily a maritime trading power in the Indian Ocean",
+            "The trans-Saharan gold trade made Mali one of the wealthiest states in the world",
+            "Islam had completely replaced all indigenous African religious practices in Mali",
+            "Mali's wealth was based primarily on the Atlantic slave trade"
+        ],
+        correct: 1,
+        explanation: "The Mali Empire controlled the trans-Saharan gold and salt trade, making it extraordinarily wealthy. Mansa Musa's famous hajj demonstrated both Mali's immense wealth and its integration into the broader Islamic world, though traditional African practices continued alongside Islam."
+    },
+    {
+        period: "Unit 1",
+        periodName: "The Global Tapestry (1200–1450)",
+        topic: "Europe",
+        question: "The European feudal system of the medieval period was primarily characterized by which of the following?",
+        options: [
+            "A centralized bureaucracy based on merit-based examinations",
+            "Decentralized political authority based on reciprocal obligations between lords and vassals",
+            "A democratic system of governance with elected representatives",
+            "A theocratic government directly controlled by the Pope"
+        ],
+        correct: 1,
+        explanation: "European feudalism was a decentralized system in which lords granted land (fiefs) to vassals in exchange for military service and loyalty. This created a hierarchy of obligations that structured medieval European political and social life, in contrast to more centralized systems like China's."
+    },
+
+    // ═══ UNIT 2: Networks of Exchange (c. 1200–1450) ═══
+    {
+        period: "Unit 2",
+        periodName: "Networks of Exchange (1200–1450)",
+        topic: "Silk Roads",
+        stimulus: `"Along the roads from China to the Mediterranean, not only silk but also paper, gunpowder, spices, and religions traveled—transforming every society they touched."`,
+        stimulusSource: "— Modern historical analysis",
+        question: "The passage best supports which of the following claims about the Silk Roads?",
+        options: [
+            "Trade along the Silk Roads was limited to luxury goods for elites",
+            "The Silk Roads facilitated the exchange of technologies, beliefs, and commodities across Eurasia",
+            "The Silk Roads primarily benefited European economies at the expense of Asian ones",
+            "Overland trade routes were less significant than maritime routes during this period"
+        ],
+        correct: 1,
+        explanation: "The Silk Roads were conduits for far more than silk—technologies (paper, gunpowder, compass), religions (Buddhism, Islam, Christianity), crops, and diseases all spread along these routes, transforming societies across Eurasia."
+    },
+    {
+        period: "Unit 2",
+        periodName: "Networks of Exchange (1200–1450)",
+        topic: "Indian Ocean Trade",
+        question: "Which of the following was a key factor enabling the growth of Indian Ocean trade networks between 1200 and 1450?",
+        options: [
+            "The construction of the Suez Canal connecting the Mediterranean to the Red Sea",
+            "Knowledge of monsoon wind patterns and advances in maritime technology such as the dhow and compass",
+            "The establishment of European colonial outposts along the East African coast",
+            "The Mongol conquest of all territories bordering the Indian Ocean"
+        ],
+        correct: 1,
+        explanation: "Indian Ocean trade flourished due to sailors' understanding of predictable monsoon winds, which allowed seasonal round-trip voyages, combined with advances in ship design (like the dhow) and navigational tools (the astrolabe and compass)."
+    },
+    {
+        period: "Unit 2",
+        periodName: "Networks of Exchange (1200–1450)",
+        topic: "Trans-Saharan Trade",
+        stimulus: `"Camels, introduced from Arabia, transformed the Sahara from an impassable barrier into a highway of commerce. Gold flowed north; salt flowed south; and Islam followed the trade."`,
+        stimulusSource: "— Survey of African history",
+        question: "According to the passage, which best describes the role of the trans-Saharan trade routes?",
+        options: [
+            "They connected sub-Saharan Africa exclusively to European markets",
+            "They facilitated economic exchange and cultural diffusion between West Africa and North Africa",
+            "They were controlled entirely by Arab merchants who excluded African traders",
+            "They declined rapidly after the introduction of the camel"
+        ],
+        correct: 1,
+        explanation: "Trans-Saharan trade connected the gold-producing regions of West Africa with the salt deposits and Mediterranean markets of North Africa. The trade also served as a conduit for the spread of Islam into sub-Saharan Africa, profoundly shaping West African states like Ghana, Mali, and Songhai."
+    },
+    {
+        period: "Unit 2",
+        periodName: "Networks of Exchange (1200–1450)",
+        topic: "Effects of Exchange",
+        question: "The spread of the Black Death (bubonic plague) across Eurasia in the 14th century is best understood as a consequence of which development?",
+        options: [
+            "European colonial expansion into the Americas",
+            "Increased connectivity through trade networks, particularly under the Mongol Empire",
+            "The collapse of the Roman Empire and resulting political instability",
+            "Deliberate biological warfare between the Ottoman and Byzantine empires"
+        ],
+        correct: 1,
+        explanation: "The Black Death spread along trade routes, particularly the Silk Roads, facilitated by the Pax Mongolica's increased connectivity. The plague likely originated in Central Asia and was carried by fleas on rats traveling with merchants and Mongol armies, devastating populations from China to Europe."
+    },
+    {
+        period: "Unit 2",
+        periodName: "Networks of Exchange (1200–1450)",
+        topic: "Swahili City-States",
+        question: "The Swahili city-states of East Africa (such as Kilwa, Mombasa, and Zanzibar) are best characterized as:",
+        options: [
+            "Isolated agricultural communities with no external trade connections",
+            "Cosmopolitan trading centers blending African, Arab, and Persian cultural elements",
+            "Military empires that conquered large territorial holdings in the African interior",
+            "European colonial settlements established during the Crusades"
+        ],
+        correct: 1,
+        explanation: "Swahili city-states were vibrant centers of Indian Ocean trade, exporting gold, ivory, and enslaved people while importing textiles and porcelain. Their culture uniquely blended Bantu African traditions with Arab and Persian influences, as reflected in the Swahili language (Bantu grammar with Arabic loanwords)."
+    },
+
+    // ═══ UNIT 3: Land-Based Empires (c. 1450–1750) ═══
+    {
+        period: "Unit 3",
+        periodName: "Land-Based Empires (1450–1750)",
+        topic: "Ottoman Empire",
+        stimulus: `"The devshirme system recruited Christian boys from the Balkans, converted them to Islam, and trained them for elite military or administrative service. The most capable could rise to the rank of grand vizier."`,
+        stimulusSource: "— Ottoman administrative records",
+        question: "The devshirme system described in the passage served which primary purpose for the Ottoman Empire?",
+        options: [
+            "To spread Christianity throughout the Ottoman territories",
+            "To create a loyal, skilled class of soldiers and administrators beholden to the sultan",
+            "To reduce the population of Christian minorities through forced emigration",
+            "To establish a democratic system of governance in conquered territories"
+        ],
+        correct: 1,
+        explanation: "The devshirme system created the Janissary corps and trained administrators who owed their status entirely to the sultan, not to aristocratic families. This gave Ottoman sultans a powerful, loyal military and bureaucratic force that helped counterbalance the influence of traditional nobility."
+    },
+    {
+        period: "Unit 3",
+        periodName: "Land-Based Empires (1450–1750)",
+        topic: "Mughal Empire",
+        question: "Emperor Akbar of the Mughal Empire is most noted for which policy approach?",
+        options: [
+            "Enforcing strict Islamic law and persecuting Hindu subjects",
+            "Promoting religious tolerance and incorporating Hindu elites into governance",
+            "Rejecting all foreign trade and isolating the Mughal Empire",
+            "Abolishing the caste system and establishing social equality"
+        ],
+        correct: 1,
+        explanation: "Akbar (r. 1556–1605) pursued a policy of sulh-i-kul (universal peace), abolishing the jizya tax on non-Muslims, marrying Rajput Hindu princesses, and appointing Hindus to high government positions. These policies helped consolidate Mughal control over a diverse, predominantly Hindu population."
+    },
+    {
+        period: "Unit 3",
+        periodName: "Land-Based Empires (1450–1750)",
+        topic: "Ming Dynasty",
+        stimulus: `"In 1433, the great treasure fleets of Admiral Zheng He were recalled, the ships left to rot in their harbors. The Confucian bureaucracy had decided that such voyages were wasteful extravagance."`,
+        stimulusSource: "— Historical account of Ming maritime policy",
+        question: "The decision described in the passage best reflects which broader pattern in Ming dynasty governance?",
+        options: [
+            "A pragmatic shift toward overland trade with Central Asia via the Silk Roads",
+            "A turn toward isolationism and the prioritization of internal stability over maritime expansion",
+            "A military strategy to concentrate naval forces against Japanese pirates",
+            "An economic calculation that maritime trade yielded insufficient revenue"
+        ],
+        correct: 1,
+        explanation: "The Ming court's decision to end Zheng He's voyages reflected a broader inward turn, prioritizing agricultural self-sufficiency, Confucian values, and internal stability over costly maritime expeditions. This contrasted sharply with the contemporaneous European Age of Exploration."
+    },
+    {
+        period: "Unit 3",
+        periodName: "Land-Based Empires (1450–1750)",
+        topic: "Safavid Empire",
+        question: "The Safavid Empire's establishment of Twelver Shia Islam as the state religion had which significant consequence?",
+        options: [
+            "It unified all Muslim-majority regions under a single religious authority",
+            "It created a distinct Persian-Shia identity and sharpened conflict with the Sunni Ottoman Empire",
+            "It led to the immediate conversion of all subjects, eliminating religious diversity",
+            "It reduced the power of the Safavid shah by subordinating him to religious clerics"
+        ],
+        correct: 1,
+        explanation: "The Safavid imposition of Twelver Shia Islam as the state religion forged a distinct national identity for Persia and created an enduring sectarian rivalry with the Sunni Ottoman Empire. This Sunni-Shia divide became a defining feature of Middle Eastern geopolitics."
+    },
+    {
+        period: "Unit 3",
+        periodName: "Land-Based Empires (1450–1750)",
+        topic: "Russian Empire",
+        question: "Peter the Great's reforms in Russia were primarily aimed at:",
+        options: [
+            "Restoring traditional Slavic customs and rejecting Western influence",
+            "Modernizing Russia's military, bureaucracy, and society along Western European models",
+            "Establishing a constitutional monarchy with an elected parliament",
+            "Expanding Russian trade networks into sub-Saharan Africa"
+        ],
+        correct: 1,
+        explanation: "Peter the Great (r. 1682–1725) pursued aggressive Westernization, reforming the military along European lines, building a navy, establishing St. Petersburg as a 'window to the West,' reorganizing the government bureaucracy, and even mandating Western dress and grooming among the nobility."
+    },
+
+    // ═══ UNIT 4: Transoceanic Interconnections (c. 1450–1750) ═══
+    {
+        period: "Unit 4",
+        periodName: "Transoceanic Interconnections (1450–1750)",
+        topic: "Columbian Exchange",
+        stimulus: `"Within a century of contact, the indigenous population of the Americas had declined by as much as 90 percent. Meanwhile, crops like maize and potatoes would eventually double the population of Europe."`,
+        stimulusSource: "— Demographic study of the Columbian Exchange",
+        question: "The developments described in the passage best illustrate which historical concept?",
+        options: [
+            "The inevitable superiority of European military technology",
+            "The profound and uneven biological consequences of transoceanic contact",
+            "The deliberate European policy of genocide against indigenous peoples",
+            "The equal exchange of benefits between the Eastern and Western Hemispheres"
+        ],
+        correct: 1,
+        explanation: "The Columbian Exchange had devastating biological consequences for indigenous Americans, who lacked immunity to Old World diseases like smallpox. Simultaneously, New World crops like potatoes and maize boosted food production and population growth in the Old World, illustrating the profoundly uneven impacts of this exchange."
+    },
+    {
+        period: "Unit 4",
+        periodName: "Transoceanic Interconnections (1450–1750)",
+        topic: "Atlantic Slave Trade",
+        question: "Which of the following best describes the primary economic motivation behind the Atlantic slave trade?",
+        options: [
+            "European desire to spread Christianity to African populations",
+            "The demand for labor on plantation economies producing cash crops like sugar, tobacco, and cotton",
+            "African rulers forcing Europeans to purchase enslaved people as tribute",
+            "The need to populate newly discovered lands with permanent settlers"
+        ],
+        correct: 1,
+        explanation: "The Atlantic slave trade was driven primarily by the enormous demand for labor on New World plantations. Sugar, tobacco, and later cotton production required intensive labor, and European colonizers turned to the forced labor of enslaved Africans to maximize profits in these cash-crop economies."
+    },
+    {
+        period: "Unit 4",
+        periodName: "Transoceanic Interconnections (1450–1750)",
+        topic: "Maritime Empires",
+        stimulus: `"The Portuguese established a network of fortified trading posts from Goa to Malacca to Macau, controlling strategic chokepoints along existing Indian Ocean trade routes rather than conquering large territories."`,
+        stimulusSource: "— Analysis of Portuguese maritime empire",
+        question: "The Portuguese strategy described in the passage is best characterized as:",
+        options: [
+            "Settler colonialism focused on establishing permanent agricultural communities",
+            "A trading-post empire designed to control maritime trade through strategic naval bases",
+            "A land-based empire comparable to the Ottomans or Mughals",
+            "A missionary enterprise focused primarily on religious conversion"
+        ],
+        correct: 1,
+        explanation: "The Portuguese built a trading-post empire (Estado da India) that relied on naval superiority and fortified bases at key chokepoints rather than territorial conquest. This model allowed a small European nation to exert significant control over Indian Ocean trade routes, extracting profits through taxation and monopolies."
+    },
+    {
+        period: "Unit 4",
+        periodName: "Transoceanic Interconnections (1450–1750)",
+        topic: "Spanish Colonial System",
+        question: "The encomienda system in Spanish America was most similar to which European institution?",
+        options: [
+            "The joint-stock company",
+            "Feudal land grants that gave lords authority over laborers on their estates",
+            "The guild system that organized artisans by craft",
+            "Parliamentary democracy with elected representatives"
+        ],
+        correct: 1,
+        explanation: "The encomienda system granted Spanish colonists the right to demand labor and tribute from indigenous peoples, mirroring the feudal relationship between lords and serfs. Though officially intended to include religious instruction, the system was widely abused and led to severe exploitation of indigenous populations."
+    },
+    {
+        period: "Unit 4",
+        periodName: "Transoceanic Interconnections (1450–1750)",
+        topic: "Silver Trade",
+        stimulus: `"Spanish silver from Potosí flowed east across the Atlantic and west across the Pacific on the Manila Galleons. By some estimates, half the world's silver production ended up in Ming China."`,
+        stimulusSource: "— Global economic history",
+        question: "The silver trade described in the passage had which of the following global effects?",
+        options: [
+            "It caused the immediate collapse of the Chinese economy",
+            "It created the first truly global network of trade, linking the Americas, Europe, Africa, and Asia",
+            "It eliminated the use of paper currency worldwide",
+            "It exclusively benefited the Spanish Empire with no effects on other regions"
+        ],
+        correct: 1,
+        explanation: "Spanish American silver (especially from Potosí and Mexican mines) created the first genuinely global trade network. Silver flowed from the Americas to Europe and Asia (particularly China, which needed silver for its tax system), connecting all major world regions in a single economic system for the first time."
+    },
+
+    // ═══ UNIT 5: Revolutions (c. 1750–1900) ═══
+    {
+        period: "Unit 5",
+        periodName: "Revolutions (1750–1900)",
+        topic: "Enlightenment",
+        stimulus: `"We hold these truths to be self-evident, that all men are created equal, that they are endowed by their Creator with certain unalienable Rights, that among these are Life, Liberty and the pursuit of Happiness."`,
+        stimulusSource: "— Thomas Jefferson, Declaration of Independence, 1776",
+        question: "The ideas expressed in this passage most directly reflect the influence of which intellectual movement?",
+        options: [
+            "The Protestant Reformation's emphasis on individual faith",
+            "Enlightenment philosophy and its concepts of natural rights and social contract theory",
+            "Romantic nationalism's celebration of ethnic identity",
+            "Marxist theory about class struggle and economic determinism"
+        ],
+        correct: 1,
+        explanation: "The Declaration of Independence drew heavily on Enlightenment thinkers, especially John Locke's concept of natural rights (life, liberty, property) and the social contract theory that government derives legitimacy from the consent of the governed."
+    },
+    {
+        period: "Unit 5",
+        periodName: "Revolutions (1750–1900)",
+        topic: "French Revolution",
+        question: "Which of the following was a significant cause of the French Revolution of 1789?",
+        options: [
+            "France's defeat in the American Revolutionary War",
+            "Financial crisis caused by war debts, combined with Enlightenment ideas and social inequality under the estate system",
+            "A peasant revolt against the abolition of feudalism",
+            "The invasion of France by the Ottoman Empire"
+        ],
+        correct: 1,
+        explanation: "The French Revolution was driven by a combination of severe financial crisis (partly from supporting the American Revolution), Enlightenment ideas about liberty and equality, and deep resentment of the rigid Three Estates system that privileged the clergy and nobility while burdening the common people with taxes."
+    },
+    {
+        period: "Unit 5",
+        periodName: "Revolutions (1750–1900)",
+        topic: "Haitian Revolution",
+        stimulus: `"In 1804, the formerly enslaved people of Saint-Domingue established Haiti as the first free Black republic in the Western Hemisphere and only the second independent nation in the Americas."`,
+        stimulusSource: "— Historical summary",
+        question: "The Haitian Revolution was historically significant because it:",
+        options: [
+            "Was the first revolution inspired by Enlightenment ideals",
+            "Demonstrated that enslaved people could successfully overthrow colonial rule and established a republic that challenged racial hierarchies",
+            "Led directly to the abolition of slavery throughout the Americas",
+            "Was peacefully achieved through diplomatic negotiation with France"
+        ],
+        correct: 1,
+        explanation: "The Haitian Revolution (1791–1804) was the only successful large-scale slave revolt in history, led by Toussaint Louverture and Jean-Jacques Dessalines. It challenged both colonialism and the racial hierarchy that underpinned Atlantic slavery, though its example inspired fear among slaveholders elsewhere."
+    },
+    {
+        period: "Unit 5",
+        periodName: "Revolutions (1750–1900)",
+        topic: "Industrial Revolution",
+        question: "Which of the following best explains why the Industrial Revolution began in Britain?",
+        options: [
+            "Britain had the largest population in Europe, providing unlimited labor",
+            "A combination of abundant coal and iron, capital from colonial trade, agricultural innovations, and a culture of entrepreneurship",
+            "The British government directly managed all industrial production through central planning",
+            "Britain was the first country to abolish feudalism, eliminating all barriers to economic growth"
+        ],
+        correct: 1,
+        explanation: "Britain's industrialization stemmed from multiple reinforcing factors: abundant natural resources (coal, iron, waterways), capital accumulated from colonial trade, agricultural improvements that freed labor, a strong banking system, patent protections, and a culture that valued innovation and entrepreneurship."
+    },
+    {
+        period: "Unit 5",
+        periodName: "Revolutions (1750–1900)",
+        topic: "Latin American Revolutions",
+        question: "Simon Bolivar's revolutionary movements in South America were most directly inspired by:",
+        options: [
+            "The Industrial Revolution's emphasis on economic modernization",
+            "Enlightenment ideals and the successful examples of the American and French Revolutions",
+            "The Haitian Revolution's model of racial equality",
+            "Traditional indigenous governance systems in the Andes"
+        ],
+        correct: 1,
+        explanation: "Bolivar and other Creole leaders were deeply influenced by Enlightenment philosophy, especially ideas about liberty, self-governance, and natural rights. The successful American and French Revolutions provided concrete models, though Bolivar also adapted these ideas to South American contexts."
+    },
+
+    // ═══ UNIT 6: Consequences of Industrialization (c. 1750–1900) ═══
+    {
+        period: "Unit 6",
+        periodName: "Consequences of Industrialization (1750–1900)",
+        topic: "New Imperialism",
+        stimulus: `"Take up the White Man's burden— / Send forth the best ye breed— / Go bind your sons to exile / To serve your captives' need."`,
+        stimulusSource: "— Rudyard Kipling, 'The White Man's Burden,' 1899",
+        question: "Kipling's poem best reflects which justification for European imperialism?",
+        options: [
+            "Economic arguments about access to raw materials and new markets",
+            "The ideology of 'civilizing mission' that claimed European racial and cultural superiority",
+            "Strategic military arguments about controlling global chokepoints",
+            "Scientific racism as developed by Charles Darwin's theory of evolution"
+        ],
+        correct: 1,
+        explanation: "Kipling's poem epitomizes the 'civilizing mission' ideology, which claimed that Europeans had a moral duty to 'civilize' non-European peoples. This paternalistic racism served as a powerful justification for imperialism, masking economic and strategic motivations behind a veneer of benevolence."
+    },
+    {
+        period: "Unit 6",
+        periodName: "Consequences of Industrialization (1750–1900)",
+        topic: "Opium Wars",
+        stimulus: `"The British traded Indian-grown opium to China in exchange for tea, silk, and porcelain, reversing the silver drain and creating millions of addicts. When the Qing government attempted to stop the trade, Britain went to war."`,
+        stimulusSource: "— Economic history of the Opium Wars",
+        question: "The Opium Wars (1839–1842, 1856–1860) best illustrate which consequence of industrialization?",
+        options: [
+            "The willingness of industrialized nations to use military force to maintain favorable trade balances",
+            "China's successful resistance to Western economic penetration",
+            "The equal terms on which European and Asian nations traded during this period",
+            "The decline of British naval power in the 19th century"
+        ],
+        correct: 0,
+        explanation: "The Opium Wars demonstrate how industrialized nations used military superiority to force open markets and maintain favorable trade terms. Britain's defeat of China led to the Treaty of Nanjing (1842), which imposed unequal terms including the cession of Hong Kong and the opening of treaty ports."
+    },
+    {
+        period: "Unit 6",
+        periodName: "Consequences of Industrialization (1750–1900)",
+        topic: "Social Effects",
+        question: "Which of the following was a major social consequence of the Industrial Revolution in Europe?",
+        options: [
+            "The complete elimination of the aristocratic class",
+            "Rapid urbanization, the growth of a factory working class, and new forms of labor exploitation including child labor",
+            "A return to agrarian lifestyles as factories proved unprofitable",
+            "The immediate establishment of universal suffrage in all industrialized nations"
+        ],
+        correct: 1,
+        explanation: "Industrialization drove massive urbanization as workers flocked to factory cities. Conditions were often brutal—long hours, dangerous workplaces, child labor, and cramped housing. These conditions eventually spurred reform movements, labor unions, and new political ideologies like socialism and Marxism."
+    },
+    {
+        period: "Unit 6",
+        periodName: "Consequences of Industrialization (1750–1900)",
+        topic: "Berlin Conference",
+        question: "The Berlin Conference of 1884–1885 is most significant because it:",
+        options: [
+            "Granted independence to African nations colonized by European powers",
+            "Established rules by which European powers divided and colonized Africa with no African representation",
+            "Created the first international organization to promote peace",
+            "Resolved territorial disputes between the Ottoman and Russian empires"
+        ],
+        correct: 1,
+        explanation: "The Berlin Conference, attended exclusively by European powers (and the United States), set rules for the 'Scramble for Africa,' requiring colonial claims to include 'effective occupation.' No African leaders were invited or consulted, and the conference accelerated the near-total colonization of Africa."
+    },
+    {
+        period: "Unit 6",
+        periodName: "Consequences of Industrialization (1750–1900)",
+        topic: "Meiji Restoration",
+        stimulus: `"Rich country, strong army — this became the motto of the new Japanese government. Within a generation, Japan transformed from a feudal society into an industrial and military power."`,
+        stimulusSource: "— Analysis of the Meiji Restoration",
+        question: "The Meiji Restoration (1868) is historically significant because it:",
+        options: [
+            "Restored traditional Japanese isolationism and rejected all Western influence",
+            "Demonstrated that a non-Western nation could rapidly industrialize and modernize to compete with European powers",
+            "Led to Japan's immediate colonization by Western powers",
+            "Established a communist government modeled on Marxist principles"
+        ],
+        correct: 1,
+        explanation: "The Meiji Restoration transformed Japan from a feudal, isolationist society into a modern industrial and military power within decades. Japan selectively adopted Western technology, military organization, and educational systems while maintaining Japanese cultural identity, eventually becoming an imperial power itself."
+    },
+
+    // ═══ UNIT 7: Global Conflict (c. 1900–Present) ═══
+    {
+        period: "Unit 7",
+        periodName: "Global Conflict (1900–Present)",
+        topic: "World War I",
+        stimulus: `"The lamps are going out all over Europe, we shall not see them lit again in our lifetime."`,
+        stimulusSource: "— Sir Edward Grey, British Foreign Secretary, August 1914",
+        question: "Which combination of factors most directly led to the outbreak of World War I?",
+        options: [
+            "The assassination of Archduke Franz Ferdinand alone caused the war",
+            "Militarism, alliance systems, imperialism, and nationalism created conditions where a single crisis could escalate into global war",
+            "Germany's invasion of Poland prompted Britain and France to declare war",
+            "The collapse of the Ottoman Empire created a power vacuum that led to conflict"
+        ],
+        correct: 1,
+        explanation: "World War I resulted from long-building tensions: militarism (arms races), entangling alliance systems (Triple Alliance vs. Triple Entente), imperial rivalries, and rising nationalism. The assassination of Franz Ferdinand in 1914 was the spark, but these underlying factors (often remembered as M.A.I.N.) made escalation almost inevitable."
+    },
+    {
+        period: "Unit 7",
+        periodName: "Global Conflict (1900–Present)",
+        topic: "Russian Revolution",
+        question: "The Bolshevik Revolution of 1917 was significant in world history because it:",
+        options: [
+            "Established the first democracy in Russian history",
+            "Created the first major state governed by Marxist-Leninist ideology, inspiring communist movements worldwide",
+            "Immediately brought prosperity and freedom to the Russian people",
+            "Was a peaceful transition of power supported by all segments of Russian society"
+        ],
+        correct: 1,
+        explanation: "The Bolshevik Revolution established the Soviet Union, the world's first major communist state. It inspired revolutionary movements worldwide and created an ideological rivalry with capitalist nations that would define much of 20th-century geopolitics, culminating in the Cold War."
+    },
+    {
+        period: "Unit 7",
+        periodName: "Global Conflict (1900–Present)",
+        topic: "World War II",
+        stimulus: `"First they came for the socialists, and I did not speak out—because I was not a socialist. Then they came for the Jews, and I did not speak out—because I was not a Jew. Then they came for me—and there was no one left to speak for me."`,
+        stimulusSource: "— Martin Niemöller, German pastor and Holocaust survivor",
+        question: "Niemöller's statement most directly reflects on which aspect of the World War II era?",
+        options: [
+            "The military strategies used in the European theater of war",
+            "The consequences of totalitarianism and the failure to resist the incremental persecution of targeted groups",
+            "The economic causes of World War II in Europe",
+            "The role of religious institutions in supporting the Nazi regime"
+        ],
+        correct: 1,
+        explanation: "Niemöller's famous reflection speaks to how totalitarian regimes, particularly Nazi Germany, systematically targeted groups one at a time while others remained silent. It underscores the dangers of political apathy and the incremental nature of persecution that culminated in the Holocaust."
+    },
+    {
+        period: "Unit 7",
+        periodName: "Global Conflict (1900–Present)",
+        topic: "Decolonization",
+        question: "Gandhi's strategy of nonviolent resistance (satyagraha) in India's independence movement was significant because it:",
+        options: [
+            "Was the first time nonviolent protest had ever been used in history",
+            "Demonstrated that colonial powers could be challenged through mass civil disobedience rather than armed rebellion",
+            "Immediately convinced the British to grant Indian independence without any conflict",
+            "Was universally accepted by all Indian independence leaders without disagreement"
+        ],
+        correct: 1,
+        explanation: "Gandhi's satyagraha demonstrated the power of nonviolent mass resistance against colonial rule. Through boycotts, marches (like the Salt March), and civil disobedience, the movement mobilized millions and pressured Britain to grant independence in 1947, inspiring similar movements worldwide."
+    },
+
+    // ═══ UNIT 8: Cold War and Decolonization (c. 1900–Present) ═══
+    {
+        period: "Unit 8",
+        periodName: "Cold War & Decolonization (1900–Present)",
+        topic: "Cold War",
+        stimulus: `"From Stettin in the Baltic to Trieste in the Adriatic, an iron curtain has descended across the continent."`,
+        stimulusSource: "— Winston Churchill, 1946",
+        question: "Churchill's 'Iron Curtain' speech described which emerging geopolitical reality?",
+        options: [
+            "The division of Europe into capitalist Western and communist Eastern blocs under US and Soviet influence",
+            "The reunification of Europe under the European Economic Community",
+            "The collapse of colonial empires in Asia and Africa",
+            "The formation of the Non-Aligned Movement by developing nations"
+        ],
+        correct: 0,
+        explanation: "Churchill's 1946 speech described the emerging division of Europe into Western capitalist democracies (aligned with the US) and Eastern communist states (under Soviet influence). This 'Iron Curtain' metaphor became a defining image of the Cold War, which lasted until 1991."
+    },
+    {
+        period: "Unit 8",
+        periodName: "Cold War & Decolonization (1900–Present)",
+        topic: "Non-Aligned Movement",
+        question: "The Non-Aligned Movement, founded at the Bandung Conference (1955), sought to:",
+        options: [
+            "Create a military alliance to rival NATO and the Warsaw Pact",
+            "Allow newly independent nations to avoid being drawn into the Cold War rivalry between the US and USSR",
+            "Establish a unified world government to replace the United Nations",
+            "Promote communist revolutions in developing countries"
+        ],
+        correct: 1,
+        explanation: "The Non-Aligned Movement, led by figures like Nehru (India), Nasser (Egypt), and Sukarno (Indonesia), represented newly independent nations that refused to align with either the US or USSR during the Cold War. They sought to chart an independent course focused on their own development needs."
+    },
+    {
+        period: "Unit 8",
+        periodName: "Cold War & Decolonization (1900–Present)",
+        topic: "African Independence",
+        stimulus: `"We prefer self-government with danger to servitude in tranquility."`,
+        stimulusSource: "— Kwame Nkrumah, first president of Ghana, 1957",
+        question: "Nkrumah's statement best reflects which broader trend of the mid-20th century?",
+        options: [
+            "The desire of colonial subjects to maintain European rule for its stability",
+            "The wave of decolonization driven by nationalist movements demanding self-determination",
+            "The Cold War strategy of the Soviet Union to destabilize Western colonies",
+            "The economic prosperity brought by colonial rule to African nations"
+        ],
+        correct: 1,
+        explanation: "Nkrumah's statement embodies the spirit of African decolonization—the conviction that self-governance, even with its challenges, was preferable to colonial subjugation. Ghana's independence in 1957 helped inspire a wave of African independence movements throughout the 1960s."
+    },
+    {
+        period: "Unit 8",
+        periodName: "Cold War & Decolonization (1900–Present)",
+        topic: "Chinese Revolution",
+        question: "Mao Zedong's strategy in the Chinese Communist Revolution differed from classical Marxism primarily because it:",
+        options: [
+            "Rejected the idea of class struggle entirely",
+            "Based the revolution on the peasantry rather than the urban industrial proletariat",
+            "Sought to establish a capitalist economy rather than a socialist one",
+            "Allied with the Chinese Nationalist Party (KMT) throughout the revolution"
+        ],
+        correct: 1,
+        explanation: "Classical Marxism predicted that revolution would come from the urban industrial working class (proletariat). Mao adapted Marxism to Chinese conditions by basing his revolution on China's massive peasant population, using rural guerrilla warfare to surround and capture cities—a model later adopted in other developing nations."
+    },
+    {
+        period: "Unit 8",
+        periodName: "Cold War & Decolonization (1900–Present)",
+        topic: "End of Cold War",
+        question: "Which of the following best explains the collapse of the Soviet Union in 1991?",
+        options: [
+            "A US military invasion of the Soviet Union",
+            "A combination of economic stagnation, nationalist movements in Soviet republics, and Gorbachev's reform policies of glasnost and perestroika",
+            "The Soviet Union's voluntary decision to embrace capitalism",
+            "The success of Soviet central planning, which made communism unnecessary"
+        ],
+        correct: 1,
+        explanation: "The Soviet Union collapsed due to multiple reinforcing factors: chronic economic stagnation, the costly war in Afghanistan, rising nationalist movements in republics like the Baltics and Ukraine, and Gorbachev's reforms (glasnost/openness and perestroika/restructuring) which inadvertently unleashed forces that the system could not contain."
+    },
+
+    // ═══ UNIT 9: Globalization (c. 1900–Present) ═══
+    {
+        period: "Unit 9",
+        periodName: "Globalization (1900–Present)",
+        topic: "Economic Globalization",
+        stimulus: `"A shirt sold in New York may contain cotton from India, buttons from China, thread from Bangladesh, and be assembled in Vietnam—all coordinated by a company headquartered in Sweden."`,
+        stimulusSource: "— Analysis of global supply chains",
+        question: "The scenario described in the passage best illustrates which feature of modern globalization?",
+        options: [
+            "The decline of international trade in the 21st century",
+            "The development of complex global supply chains that distribute production across multiple countries",
+            "The self-sufficiency of national economies in the modern world",
+            "The dominance of a single country in global manufacturing"
+        ],
+        correct: 1,
+        explanation: "Modern globalization is characterized by complex supply chains where different stages of production are distributed across multiple countries based on comparative advantage, labor costs, and specialization. This has increased economic interdependence but also raised concerns about labor standards and environmental impacts."
+    },
+    {
+        period: "Unit 9",
+        periodName: "Globalization (1900–Present)",
+        topic: "Technology & Communication",
+        question: "The spread of the internet and social media in the early 21st century has most significantly:",
+        options: [
+            "Eliminated all cultural differences between nations",
+            "Accelerated the global exchange of information, facilitated social movements, and created new economic models",
+            "Reduced the influence of governments over their citizens",
+            "Made traditional forms of media completely obsolete worldwide"
+        ],
+        correct: 1,
+        explanation: "The internet and social media have dramatically accelerated information exchange, enabled movements like the Arab Spring, created new economic models (e-commerce, gig economy), and connected billions globally. However, they've also raised concerns about misinformation, privacy, and digital divides between wealthy and developing nations."
+    },
+    {
+        period: "Unit 9",
+        periodName: "Globalization (1900–Present)",
+        topic: "Global Institutions",
+        question: "The United Nations, World Bank, and International Monetary Fund were established after World War II primarily to:",
+        options: [
+            "Ensure American dominance over global affairs",
+            "Create frameworks for international cooperation, economic stability, and conflict resolution to prevent another world war",
+            "Replace national governments with a single world government",
+            "Promote communist ideology throughout the developing world"
+        ],
+        correct: 1,
+        explanation: "Post-WWII international institutions were designed to prevent the conditions that led to two world wars. The UN aimed to provide a forum for diplomacy, while the World Bank and IMF sought to promote economic stability and development. These institutions reflected a belief that cooperation and economic interdependence could prevent future conflicts."
+    },
+    {
+        period: "Unit 9",
+        periodName: "Globalization (1900–Present)",
+        topic: "Environmental Challenges",
+        stimulus: `"For the first time in human history, the actions of one species are altering the climate of the entire planet. The carbon dioxide released by burning fossil fuels since the Industrial Revolution has raised global temperatures by over 1 degree Celsius."`,
+        stimulusSource: "— IPCC Climate Report summary",
+        question: "The environmental challenge described in the passage is best understood as a consequence of:",
+        options: [
+            "Natural climate cycles unrelated to human activity",
+            "The cumulative impact of industrialization and fossil fuel dependency since the 18th century",
+            "Deforestation in the Amazon rainforest alone",
+            "Nuclear weapons testing during the Cold War"
+        ],
+        correct: 1,
+        explanation: "Climate change is a direct consequence of the industrialization that began in the 18th century and accelerated globally in the 20th. The burning of fossil fuels (coal, oil, natural gas) for energy releases carbon dioxide, creating a greenhouse effect. This represents a truly global challenge requiring unprecedented international cooperation."
+    },
+    {
+        period: "Unit 9",
+        periodName: "Globalization (1900–Present)",
+        topic: "Resistance to Globalization",
+        question: "Opposition to globalization in the late 20th and early 21st centuries has been driven by concerns about:",
+        options: [
+            "The complete absence of international trade",
+            "Job losses in developed countries, cultural homogenization, environmental degradation, and growing inequality",
+            "The total elimination of national sovereignty worldwide",
+            "The decline of technology and communication networks"
+        ],
+        correct: 1,
+        explanation: "Resistance to globalization comes from multiple directions: workers in developed countries who lose jobs to outsourcing, cultural preservationists who fear homogenization, environmentalists concerned about unsustainable growth, and those who see globalization as widening the gap between rich and poor both within and between nations."
+    },
+
+    // ═══ ADDITIONAL: Pre-1200 Foundations ═══
+    {
+        period: "Foundations",
+        periodName: "Foundations (8000 BCE–1200 CE)",
+        topic: "Neolithic Revolution",
+        question: "The Neolithic Revolution (c. 8000 BCE) was a turning point in human history primarily because it:",
+        options: [
+            "Marked the invention of writing and the beginning of recorded history",
+            "Represented the shift from nomadic hunter-gatherer lifestyles to settled agricultural communities, enabling population growth and social complexity",
+            "Was the first time humans used tools made from metal rather than stone",
+            "Led to the immediate development of democratic forms of government"
+        ],
+        correct: 1,
+        explanation: "The Neolithic Revolution—the transition to agriculture—was one of the most transformative developments in human history. Settled farming enabled food surpluses, which supported population growth, social stratification, specialization of labor, and eventually the development of cities, writing, and complex civilizations."
+    },
+    {
+        period: "Foundations",
+        periodName: "Foundations (8000 BCE–1200 CE)",
+        topic: "River Valley Civilizations",
+        stimulus: `"Along the Nile, the Tigris and Euphrates, the Indus, and the Yellow River, the earliest complex societies emerged—each developing writing, monumental architecture, and social hierarchies."`,
+        stimulusSource: "— Overview of early civilizations",
+        question: "The river valley civilizations described in the passage share which common characteristic that explains their development?",
+        options: [
+            "They all practiced monotheistic religions",
+            "Access to fertile floodplains that enabled agricultural surpluses, supporting urbanization and state formation",
+            "They were all connected by long-distance maritime trade routes",
+            "They all developed identical systems of writing and governance"
+        ],
+        correct: 1,
+        explanation: "River valley civilizations emerged where predictable flooding created fertile agricultural land. The surpluses produced by irrigation agriculture supported growing populations, social stratification, specialized labor, monumental building projects, and the development of writing systems—though each civilization developed these features independently."
+    },
+    {
+        period: "Foundations",
+        periodName: "Foundations (8000 BCE–1200 CE)",
+        topic: "Classical Empires",
+        question: "The Roman, Han Chinese, Maurya/Gupta, and Persian empires of the classical era all shared which governing challenge?",
+        options: [
+            "Maintaining control over vast, diverse territories with limited communication and transportation technology",
+            "Resisting invasion from the Mongol Empire",
+            "Managing industrialized economies",
+            "Establishing overseas colonial empires"
+        ],
+        correct: 0,
+        explanation: "All classical empires faced the fundamental challenge of governing vast territories with diverse populations using pre-modern technology. They developed various solutions: road systems (Rome, Persia), bureaucracies (Han China), provincial administration, and cultural/religious unifying ideologies to maintain cohesion."
+    },
+    {
+        period: "Foundations",
+        periodName: "Foundations (8000 BCE–1200 CE)",
+        topic: "Spread of Religions",
+        stimulus: `"Buddhism spread from India along the Silk Roads to Central Asia, China, Korea, and Japan. Christianity spread through the Roman Empire. Islam spread rapidly across the Middle East, North Africa, and into South and Southeast Asia."`,
+        stimulusSource: "— Comparative religion history",
+        question: "The spread of these major religions was most commonly facilitated by:",
+        options: [
+            "Government mandates that forced all subjects to convert",
+            "Trade networks, missionary activity, and military conquest that carried religious ideas across cultural boundaries",
+            "The inherent superiority of monotheistic beliefs over polytheistic ones",
+            "The decline of all other belief systems before 600 CE"
+        ],
+        correct: 1,
+        explanation: "Major religions spread through multiple reinforcing channels: merchants carried beliefs along trade routes, missionaries actively proselytized, and military conquests established political conditions favorable to religious expansion. In each case, religions also adapted to local cultures, creating diverse regional expressions of each faith."
+    },
+    {
+        period: "Foundations",
+        periodName: "Foundations (8000 BCE–1200 CE)",
+        topic: "Belief Systems",
+        question: "Confucianism and Hinduism both served to:",
+        options: [
+            "Promote revolutionary change and the overthrow of existing social orders",
+            "Reinforce and justify existing social hierarchies—the caste system in South Asia and filial relationships in East Asia",
+            "Establish theocratic governments ruled by religious authorities",
+            "Encourage geographic expansion and the conquest of neighboring peoples"
+        ],
+        correct: 1,
+        explanation: "Both Confucianism and Hinduism functioned as systems that reinforced social order. The Hindu caste system defined social roles based on birth, while Confucianism established hierarchical relationships (ruler-subject, father-son, husband-wife) that emphasized duty and obedience, promoting stability in their respective societies."
+    }
+];
+
+// ── State ──
+let activePeriods = new Set();
+let filteredQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let streak = 0;
+let answered = 0;
+let answered_this_session = false;
+
+const periods = ["All", "Foundations", "Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5", "Unit 6", "Unit 7", "Unit 8", "Unit 9"];
+
+// ── Initialize ──
+function init() {
+    const filterDiv = document.getElementById('periodFilter');
+    periods.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'period-btn' + (p === 'All' ? ' active' : '');
+        btn.textContent = p;
+        btn.onclick = () => togglePeriod(p, btn);
+        filterDiv.appendChild(btn);
+    });
+    activePeriods.add('All');
+}
+
+function togglePeriod(period, btn) {
+    const allBtn = document.querySelector('.period-btn');
+    if (period === 'All') {
+        activePeriods.clear();
+        activePeriods.add('All');
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        allBtn.classList.add('active');
+    } else {
+        activePeriods.delete('All');
+        allBtn.classList.remove('active');
+        if (activePeriods.has(period)) {
+            activePeriods.delete(period);
+            btn.classList.remove('active');
+        } else {
+            activePeriods.add(period);
+            btn.classList.add('active');
+        }
+        if (activePeriods.size === 0) {
+            activePeriods.add('All');
+            allBtn.classList.add('active');
+        }
+    }
+}
+
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function startQuiz() {
+    if (activePeriods.has('All')) {
+        filteredQuestions = [...questions];
+    } else {
+        filteredQuestions = questions.filter(q => activePeriods.has(q.period));
+    }
+
+    if (filteredQuestions.length === 0) {
+        alert('No questions available for selected periods.');
+        return;
+    }
+
+    shuffle(filteredQuestions);
+    currentIndex = 0;
+    score = 0;
+    streak = 0;
+    answered = 0;
+
+    document.getElementById('home').style.display = 'none';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('quiz').style.display = 'block';
+
+    updateStats();
+    renderQuestion();
+}
+
+function renderQuestion() {
+    const q = filteredQuestions[currentIndex];
+    const card = document.getElementById('questionCard');
+    const letters = ['A', 'B', 'C', 'D'];
+
+    let html = `
+        <div class="question-meta">
+            <span class="badge badge-period">${q.period}</span>
+            <span class="badge badge-topic">${q.topic}</span>
+            <span class="badge badge-num">Q${currentIndex + 1} of ${filteredQuestions.length}</span>
+        </div>
+    `;
+
+    if (q.stimulus) {
+        html += `<div class="stimulus">${q.stimulus}`;
+        if (q.stimulusSource) html += `<div class="stimulus-source">${q.stimulusSource}</div>`;
+        html += `</div>`;
+    }
+
+    html += `<div class="question-text">${q.question}</div>`;
+    html += `<div class="options">`;
+
+    q.options.forEach((opt, i) => {
+        html += `
+            <div class="option" onclick="selectAnswer(${i})" id="opt-${i}">
+                <span class="option-letter">${letters[i]}</span>
+                <span>${opt}</span>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    card.innerHTML = html;
+
+    document.getElementById('explanation').className = 'explanation';
+    document.getElementById('explanation').innerHTML = '';
+    document.getElementById('nextBtn').className = 'next-btn';
+
+    const progressPct = (currentIndex / filteredQuestions.length) * 100;
+    document.getElementById('progressFill').style.width = progressPct + '%';
+}
+
+function selectAnswer(idx) {
+    const q = filteredQuestions[currentIndex];
+    const options = document.querySelectorAll('.option');
+
+    // Prevent double-click
+    if (options[0].classList.contains('disabled')) return;
+
+    options.forEach(o => o.classList.add('disabled'));
+
+    answered++;
+
+    if (idx === q.correct) {
+        score++;
+        streak++;
+        options[idx].classList.add('correct');
+    } else {
+        streak = 0;
+        options[idx].classList.add('incorrect');
+        options[q.correct].classList.add('show-correct');
+    }
+
+    // Show explanation
+    const expDiv = document.getElementById('explanation');
+    expDiv.innerHTML = `<h4>${idx === q.correct ? 'Correct!' : 'Incorrect'}</h4><p>${q.explanation}</p>`;
+    expDiv.className = 'explanation show';
+
+    document.getElementById('nextBtn').className = 'next-btn show';
+    updateStats();
+}
+
+function nextQuestion() {
+    currentIndex++;
+    if (currentIndex >= filteredQuestions.length) {
+        showResults();
+        return;
+    }
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateStats() {
+    document.getElementById('scoreVal').textContent = score;
+    document.getElementById('totalVal').textContent = `${answered}/${filteredQuestions.length}`;
+    document.getElementById('streakVal').textContent = streak;
+    document.getElementById('pctVal').textContent = answered > 0 ? Math.round((score / answered) * 100) + '%' : '0%';
+}
+
+function showResults() {
+    document.getElementById('quiz').style.display = 'none';
+    const pct = Math.round((score / answered) * 100);
+    let grade = '';
+    if (pct >= 90) grade = 'Excellent!';
+    else if (pct >= 80) grade = 'Great Job!';
+    else if (pct >= 70) grade = 'Good Work!';
+    else if (pct >= 60) grade = 'Keep Practicing!';
+    else grade = 'Study More!';
+
+    const res = document.getElementById('results');
+    res.style.display = 'block';
+    res.innerHTML = `
+        <h2>${grade}</h2>
+        <div class="score-circle">
+            <span class="pct">${pct}%</span>
+            <span class="label">Score</span>
+        </div>
+        <div class="results-detail">
+            <div class="stat">
+                <div class="stat-value" style="color:#22c55e">${score}</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" style="color:#ef4444">${answered - score}</div>
+                <div class="stat-label">Incorrect</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" style="color:#60a5fa">${answered}</div>
+                <div class="stat-label">Total</div>
+            </div>
+        </div>
+        <button class="restart-btn" onclick="restart()">Try Again</button>
+    `;
+}
+
+function restart() {
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('home').style.display = 'block';
+}
+
+init();
+</script>
+</body>
+</html>
