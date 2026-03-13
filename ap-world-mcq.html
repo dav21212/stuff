@@ -212,6 +212,20 @@
         .next-btn:hover { opacity: 0.9; }
         .next-btn.show { display: block; }
 
+        /* Quit button */
+        .quit-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quit-btn:hover { border-color: #ef4444; color: #ef4444; }
+
         /* Home screen */
         .home-screen {
             text-align: center;
@@ -349,6 +363,10 @@
                     <div class="stat-value" id="pctVal">0%</div>
                     <div class="stat-label">Accuracy</div>
                 </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <div></div>
+                <button class="quit-btn" onclick="quitQuiz()">Quit</button>
             </div>
             <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
             <div class="question-card" id="questionCard"></div>
@@ -1139,7 +1157,7 @@ let currentIndex = 0;
 let score = 0;
 let streak = 0;
 let answered = 0;
-let answered_this_session = false;
+let shuffledCorrect = 0;
 
 const periods = ["All", "Foundations", "Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5", "Unit 6", "Unit 7", "Unit 8", "Unit 9"];
 
@@ -1219,6 +1237,11 @@ function renderQuestion() {
     const card = document.getElementById('questionCard');
     const letters = ['A', 'B', 'C', 'D'];
 
+    // Shuffle options: create index array, shuffle it, track where correct answer lands
+    const indices = [0, 1, 2, 3];
+    shuffle(indices);
+    shuffledCorrect = indices.indexOf(q.correct);
+
     let html = `
         <div class="question-meta">
             <span class="badge badge-period">${q.period}</span>
@@ -1236,11 +1259,11 @@ function renderQuestion() {
     html += `<div class="question-text">${q.question}</div>`;
     html += `<div class="options">`;
 
-    q.options.forEach((opt, i) => {
+    indices.forEach((origIdx, displayIdx) => {
         html += `
-            <div class="option" onclick="selectAnswer(${i})" id="opt-${i}">
-                <span class="option-letter">${letters[i]}</span>
-                <span>${opt}</span>
+            <div class="option" onclick="selectAnswer(${displayIdx})" id="opt-${displayIdx}">
+                <span class="option-letter">${letters[displayIdx]}</span>
+                <span>${q.options[origIdx]}</span>
             </div>
         `;
     });
@@ -1267,19 +1290,19 @@ function selectAnswer(idx) {
 
     answered++;
 
-    if (idx === q.correct) {
+    if (idx === shuffledCorrect) {
         score++;
         streak++;
         options[idx].classList.add('correct');
     } else {
         streak = 0;
         options[idx].classList.add('incorrect');
-        options[q.correct].classList.add('show-correct');
+        options[shuffledCorrect].classList.add('show-correct');
     }
 
     // Show explanation
     const expDiv = document.getElementById('explanation');
-    expDiv.innerHTML = `<h4>${idx === q.correct ? 'Correct!' : 'Incorrect'}</h4><p>${q.explanation}</p>`;
+    expDiv.innerHTML = `<h4>${idx === shuffledCorrect ? 'Correct!' : 'Incorrect'}</h4><p>${q.explanation}</p>`;
     expDiv.className = 'explanation show';
 
     document.getElementById('nextBtn').className = 'next-btn show';
@@ -1337,6 +1360,15 @@ function showResults() {
         </div>
         <button class="restart-btn" onclick="restart()">Try Again</button>
     `;
+}
+
+function quitQuiz() {
+    if (answered > 0) {
+        showResults();
+    } else {
+        document.getElementById('quiz').style.display = 'none';
+        document.getElementById('home').style.display = 'block';
+    }
 }
 
 function restart() {
